@@ -87,4 +87,7 @@ Sensor data is processed by ESP32 and uploaded to the ThinkSpeak cloud platform 
 
 https://wokwi.com/projects/465151341408266241
 
+## Youtube link {Demo video} 
+
+https://youtu.be/BxB7_B8NXfs
 
