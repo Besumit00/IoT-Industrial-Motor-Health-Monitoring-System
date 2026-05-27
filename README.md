@@ -83,4 +83,8 @@ Sensor data is processed by ESP32 and uploaded to the ThinkSpeak cloud platform 
 - Real motor integration
 
 ---
+## Wokwi Simulation
+
+https://wokwi.com/projects/465151341408266241
+
 
