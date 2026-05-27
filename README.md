@@ -80,3 +80,15 @@ Sensor data is processed by ESP32 and uploaded to the ThinkSpeak cloud platform 
 - ThinkSpeak
 - Wokwi
 - Sensor Interfacing
+
+## System Architecture
+
+![Architecture](system_architecture.png)
+
+## Circuit Design
+
+![Circuit](circuit_diagram.png)
+
+## ThinkSpeak Dashboard
+
+![Dashboard](thinkspeak_dashboard.png)
