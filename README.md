@@ -39,11 +39,6 @@ Sensor data is processed by ESP32 and uploaded to the ThinkSpeak cloud platform 
 
 ---
 
-## System Architecture
-
-(Add architecture image here)
-
----
 
 ## Working Principle
 
@@ -56,21 +51,7 @@ Sensor data is processed by ESP32 and uploaded to the ThinkSpeak cloud platform 
 
 ---
 
-## ThinkSpeak Dashboard
 
-(Add dashboard screenshot here)
-
----
-
-## Future Improvements
-
-- AI-based anomaly detection
-- MQTT communication
-- PLC integration
-- Mobile dashboard application
-- Real motor integration
-
----
 
 ## Technologies Used
 
@@ -92,3 +73,14 @@ Sensor data is processed by ESP32 and uploaded to the ThinkSpeak cloud platform 
 ## ThinkSpeak Dashboard
 
 ![Dashboard](thinkspeak_dashboard.png)
+
+## Future Improvements
+
+- AI-based anomaly detection
+- MQTT communication
+- PLC integration
+- Mobile dashboard application
+- Real motor integration
+
+---
+
