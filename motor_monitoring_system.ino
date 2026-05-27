@@ -1,5 +1,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+
+#include <Wire.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 
@@ -9,13 +11,14 @@
 // WIFI CONFIGURATION
 // =====================================================
 
+// For Wokwi Simulation
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 // =====================================================
 // THINGSPEAK API KEY
 // =====================================================
-
+// ADD your thinkspeak APIKEY
 String apiKey = "SBBAMMJSIS09ZN0H";
 
 // =====================================================
@@ -44,7 +47,6 @@ Adafruit_MPU6050 mpu;
 int warningCounter = 0;
 int criticalCounter = 0;
 
-// Number of consecutive abnormal readings required
 const int faultLimit = 3;
 
 // =====================================================
@@ -53,7 +55,14 @@ const int faultLimit = 3;
 
 void setup() {
 
+  // Start Serial Monitor
   Serial.begin(115200);
+
+  delay(1000);
+
+  Serial.println("==================================");
+  Serial.println("SYSTEM STARTING...");
+  Serial.println("==================================");
 
   // =====================================================
   // START DHT22
@@ -61,13 +70,15 @@ void setup() {
 
   dht.begin();
 
+  Serial.println("DHT22 Initialized");
+
   // =====================================================
   // START MPU6050
   // =====================================================
 
   if (!mpu.begin()) {
 
-    Serial.println("MPU6050 not found!");
+    Serial.println("ERROR: MPU6050 NOT FOUND");
 
     while (1) {
       delay(10);
@@ -87,22 +98,38 @@ void setup() {
   // CONNECT TO WIFI
   // =====================================================
 
-  WiFi.begin(ssid, password);
-
   Serial.print("Connecting to WiFi");
 
-  while (WiFi.status() != WL_CONNECTED) {
+  WiFi.begin(ssid, password);
+
+  int wifiTimeout = 0;
+
+  while (WiFi.status() != WL_CONNECTED && wifiTimeout < 20) {
 
     delay(500);
     Serial.print(".");
+
+    wifiTimeout++;
   }
 
-  Serial.println("");
-  Serial.println("WiFi Connected!");
+  // =====================================================
+  // WIFI STATUS
+  // =====================================================
 
-  Serial.println("=====================================");
-  Serial.println("Industrial Motor Monitoring Started");
-  Serial.println("=====================================");
+  if (WiFi.status() == WL_CONNECTED) {
+
+    Serial.println("");
+    Serial.println("WiFi Connected Successfully!");
+
+  } else {
+
+    Serial.println("");
+    Serial.println("WiFi Connection Failed");
+  }
+
+  Serial.println("==================================");
+  Serial.println("Industrial Motor Monitoring Active");
+  Serial.println("==================================");
 }
 
 // =====================================================
@@ -111,14 +138,23 @@ void setup() {
 
 void loop() {
 
+  Serial.println("");
+  Serial.println("========== NEW CYCLE ==========");
+
   // =====================================================
-  // READ DHT22
+  // READ TEMPERATURE
   // =====================================================
 
   float temperature = dht.readTemperature();
 
+  if (isnan(temperature)) {
+
+    Serial.println("DHT22 Read Failed");
+    return;
+  }
+
   // =====================================================
-  // READ POTENTIOMETER
+  // READ RPM FROM POTENTIOMETER
   // =====================================================
 
   int potValue = analogRead(POTPIN);
@@ -138,19 +174,27 @@ void loop() {
   float vibrationZ = a.acceleration.z;
 
   // =====================================================
-  // MOTOR STATUS VARIABLE
+  // MOTOR STATUS
   // =====================================================
 
   int motorStatus = 0;
 
+  // 0 = Healthy
+  // 1 = Warning
+  // 2 = Critical
+
   // =====================================================
-  // DEFINE CONDITIONS
+  // WARNING CONDITION
   // =====================================================
 
   bool warningCondition =
     (temperature > 50 ||
      rpm > 4000 ||
      abs(vibrationX) > 8);
+
+  // =====================================================
+  // CRITICAL CONDITION
+  // =====================================================
 
   bool criticalCondition =
     (temperature > 70 ||
@@ -177,7 +221,7 @@ void loop() {
       digitalWrite(BUZZERPIN, HIGH);
       digitalWrite(LEDPIN, LOW);
 
-      Serial.println("CRITICAL MOTOR FAULT CONFIRMED!");
+      Serial.println("CRITICAL MOTOR FAULT!");
     }
   }
 
@@ -201,7 +245,7 @@ void loop() {
       digitalWrite(BUZZERPIN, LOW);
       digitalWrite(LEDPIN, HIGH);
 
-      Serial.println("WARNING CONDITION CONFIRMED!");
+      Serial.println("WARNING CONDITION DETECTED");
     }
   }
 
@@ -223,10 +267,10 @@ void loop() {
   }
 
   // =====================================================
-  // DISPLAY SENSOR VALUES
+  // DISPLAY VALUES
   // =====================================================
 
-  Serial.println("=====================================");
+  Serial.println("----------------------------------");
 
   Serial.print("Temperature: ");
   Serial.print(temperature);
@@ -263,6 +307,9 @@ void loop() {
       "&field4=" + String(vibrationX) +
       "&field5=" + String(vibrationY);
 
+    Serial.println("----------------------------------");
+    Serial.println("Uploading Data to ThinkSpeak...");
+
     http.begin(url);
 
     int httpResponseCode = http.GET();
@@ -275,13 +322,13 @@ void loop() {
 
   else {
 
-    Serial.println("WiFi Disconnected");
+    Serial.println("WiFi Not Connected");
   }
 
-  Serial.println("");
+  Serial.println("==================================");
 
   // =====================================================
-  // THINGSPEAK UPDATE DELAY
+  // THINGSPEAK DELAY
   // =====================================================
 
   delay(15000);
