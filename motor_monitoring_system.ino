@@ -18,8 +18,8 @@ const char* password = "";
 // =====================================================
 // THINGSPEAK API KEY
 // =====================================================
-// ADD your thinkspeak APIKEY
-String apiKey = "SBBAMMJSIS09ZN0H";
+// ADD your thingspeak APIKEY (get one from thingspeak.com > your channel > API Keys)
+String apiKey = "YOUR_THINGSPEAK_WRITE_API_KEY";
 
 // =====================================================
 // PIN DEFINITIONS
